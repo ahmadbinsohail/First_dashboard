@@ -19,4 +19,4 @@ pivot = (df[df["System Full"].isin(top_5_systems)].pivot_table(
       values="Units(m)" ,
       aggfunc="sum"))
 
-pivot.plot(figsize=(10,5))
+pivot.plot(figsize=(10,5)) 
