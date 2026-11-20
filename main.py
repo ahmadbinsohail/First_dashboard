@@ -14,7 +14,7 @@ df = pd.read_csv( file_path / "clean_games.csv",parse_dates=["Release Year"])
 top_5_systems = df["System Full"].value_counts().head(5).index
 
 
-pivot = (df[df["System Full"].isin(top_5_systems)].pivot_table(
+pivot_5_systems = (df[df["System Full"].isin(top_5_systems)].pivot_table(
     index= "Release Year",
      columns="System Full",
       values="Units(m)" ,
@@ -34,12 +34,20 @@ conditions = [
 brands = [ "Sony","Microsoft","Nintendo","Sega"]
 df["Brand"] = np.select(conditions,brands,default="Other")
 #st.write(df)
-lib = df.dropna(subset="Release Year").copy()
-lib["Release Year"] = pd.to_datetime(lib["Release Year"]).dt.year 
+modified_df = df.dropna(subset="Release Year").copy()
+modified_df["Release Year"] = pd.to_datetime(modified_df["Release Year"]).dt.year 
 #lib["Release Year"] = lib["Release Year"].astype(int)
-counts = lib.groupby(["System Full","Release Year"]).size().unstack(fill_value=0)
+counts = modified_df.groupby(["System Full","Release Year"]).size().unstack(fill_value=0)
 #st.table(counts)
 
-brand_release_peryear = lib.pivot_table(index="Release Year",columns="Brand",values="Game Name", aggfunc="count",fill_value=0)
+games_peryear = modified_df.pivot_table(index="Release Year",columns="Brand",values="Game Name", aggfunc="count",fill_value=0)
 #st.write(brand_release_peryear)
 
+top_5_gamelibaray = df.groupby(["Release Year","Brand"])["Game Name"].size().unstack(fill_value=0)
+st.line_chart(top_5_gamelibaray)
+
+golden_era = modified_df.groupby("Release Year")[["Game Name"]].count()
+st.write(golden_era.nlargest(1,"Game Name"))
+
+brands_groupby_years = modified_df.groupby("Brand")["Release Year"].agg(firstyear="min",lastyear="max",totallgames="size")
+st.write(brands_groupby_years)
