@@ -49,5 +49,19 @@ st.line_chart(top_5_gamelibaray)
 golden_era = modified_df.groupby("Release Year")[["Game Name"]].count()
 st.write(golden_era.nlargest(1,"Game Name"))
 
-brands_groupby_years = modified_df.groupby("Brand")["Release Year"].agg(firstyear="min",lastyear="max",totallgames="size")
+brands_groupby_years = modified_df.groupby("Brand")["Release Year"].agg(First_Year="min",Last_Year="max",Totall_Games="size")
+brands_groupby_years["Life_Span"] = brands_groupby_years["Last_Year"] - brands_groupby_years["First_Year"] + 1
 st.write(brands_groupby_years)
+
+
+
+dummy = modified_df.groupby(["Brand","Release Year"],as_index=False)["Game Name"].count().rename(columns={"Game Name":"Game Count"})
+
+peak_year_by_brand = dummy.loc[dummy.groupby("Brand")["Game Count"].idxmax()].set_index("Brand")
+st.write(peak_year_by_brand)
+
+
+
+year = 1999
+specific_year_games = dummy[dummy["Release Year"]==year]
+st.write(specific_year_games)
